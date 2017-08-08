@@ -9,3 +9,7 @@ target_link_libraries( Calib ${OpenCV_LIBS} )
 project( StereoCalib )
 add_executable( StereoCalib src/stereocalibrate.cpp )
 target_link_libraries( StereoCalib ${OpenCV_LIBS} )
+
+project( Disparity )
+add_executable( Disparity src/disparity2.cpp )
+target_link_libraries( Disparity ${OpenCV_LIBS} )

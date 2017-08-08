@@ -1,10 +1,12 @@
-#include "opencv2/core/core.hpp"
-#include "opencv2/calib3d/calib3d.hpp"
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include "opencv2/contrib/contrib.hpp"
 #include <stdio.h>
 #include <string.h>
+
+#include "opencv2/core/core.hpp"
+#include "opencv2/calib3d/calib3d.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
+#include "opencv2/contrib/contrib.hpp"
+
 using namespace cv;
 using namespace std;
 
@@ -20,7 +22,7 @@ int main(int argc, char* argv[])
 
     if (!(strcmp(method, "BM")))
     {
-        StereoBM sbm;
+        StereoBM sbm(
         sbm.state->SADWindowSize = 9;
         sbm.state->numberOfDisparities = 112;
         sbm.state->preFilterSize = 5;
@@ -35,22 +37,48 @@ int main(int argc, char* argv[])
     }
     else if (!(strcmp(method, "SGBM")))
     {
-        StereoSGBM sbm;
-        sbm.SADWindowSize = 3;
-        sbm.numberOfDisparities = 144;
-        sbm.preFilterCap = 63;
-        sbm.minDisparity = -39;
-        sbm.uniquenessRatio = 10;
-        sbm.speckleWindowSize = 100;
-        sbm.speckleRange = 32;
-        sbm.disp12MaxDiff = 1;
-        sbm.fullDP = false;
-        sbm.P1 = 216;
-        sbm.P2 = 864;
+        // Function signature:
+        // cv::StereoSGBM::create	(  int 	minDisparity = 0,
+        //                             int 	numDisparities = 16,
+        //                             int 	blockSize = 3,
+        //                             int 	P1 = 0,
+        //                             int 	P2 = 0,
+        //                             int 	disp12MaxDiff = 0,
+        //                             int 	preFilterCap = 0,
+        //                             int 	uniquenessRatio = 0,
+        //                             int 	speckleWindowSize = 0,
+        //                             int 	speckleRange = 0,
+        //                             int 	mode = StereoSGBM::MODE_SGBM
+        // )
+
+        // Original Settings:
+        // sbm.SADWindowSize = 3;
+        // sbm.numberOfDisparities = 144;
+        // sbm.preFilterCap = 63;
+        // sbm.minDisparity = -39;
+        // sbm.uniquenessRatio = 10;
+        // sbm.speckleWindowSize = 100;
+        // sbm.speckleRange = 32;
+        // sbm.disp12MaxDiff = 1;
+        // sbm.fullDP = false;
+        // sbm.P1 = 216;
+        // sbm.P2 = 864;
+
+        Prt<StereoSGBM> sbm = StereoSGBM::create( -39,
+                                                  144,
+                                                  3,
+                                                  216,
+                                                  864,
+                                                  1,
+                                                  63,
+                                                  10,
+                                                  100,
+                                                  32,
+                                                  StereoSGBM::MODE_SGBM);
         sbm(g1, g2, disp);
     }
 
-    
+
     normalize(disp, disp8, 0, 255, CV_MINMAX, CV_8U);
 
     imshow("left", img1);
