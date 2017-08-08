@@ -1,15 +1,23 @@
+#include <stdio.h>
+#include <iostream>
+#include <vector>
+
 #include "opencv2/core/core.hpp"
 #include "opencv2/calib3d/calib3d.hpp"
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include "opencv2/contrib/contrib.hpp"
-#include <stdio.h>
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
 
-using namespace cv;
 using namespace std;
+using namespace cv;
 
 int main(int argc, char* argv[])
 {
+    cout << "Started" << endl;
+    if (argc != 4){
+        cout << "Expected 3 arguments. " << argc-1 << " given. Aborting..." << endl;
+        return -1;
+    }
+
     int numBoards = atoi(argv[1]);
     int board_w = atoi(argv[2]);
     int board_h = atoi(argv[3]);
@@ -27,9 +35,11 @@ int main(int argc, char* argv[])
         obj.push_back(Point3f(j/board_w, j%board_w, 0.0f));
     }
 
+    cout << "Attempting to initialize VideoCapture..." << endl;
     Mat img1, img2, gray1, gray2;
     VideoCapture cap1 = VideoCapture(1);
     VideoCapture cap2 = VideoCapture(2);
+    cout << "Successfully initialized VideoCapture."
 
     int success = 0, k = 0;
     bool found1 = false, found2 = false;
@@ -57,7 +67,7 @@ int main(int argc, char* argv[])
             cornerSubPix(gray2, corners2, Size(11, 11), Size(-1, -1), TermCriteria(CV_TERMCRIT_EPS | CV_TERMCRIT_ITER, 30, 0.1));
             drawChessboardCorners(gray2, board_sz, corners2, found2);
         }
-        
+
         imshow("image1", gray1);
         imshow("image2", gray2);
 
@@ -92,10 +102,10 @@ int main(int argc, char* argv[])
     Mat D1, D2;
     Mat R, T, E, F;
 
-    stereoCalibrate(object_points, imagePoints1, imagePoints2, 
+    stereoCalibrate(object_points, imagePoints1, imagePoints2,
                     CM1, D1, CM2, D2, img1.size(), R, T, E, F,
-                    cvTermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 100, 1e-5), 
-                    CV_CALIB_SAME_FOCAL_LENGTH | CV_CALIB_ZERO_TANGENT_DIST);
+                    CV_CALIB_SAME_FOCAL_LENGTH | CV_CALIB_ZERO_TANGENT_DIST,
+                    cvTermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 100, 1e-5));
 
     FileStorage fs1("mystereocalib.yml", FileStorage::WRITE);
     fs1 << "CM1" << CM1;
@@ -132,7 +142,7 @@ int main(int argc, char* argv[])
     printf("Undistort complete\n");
 
     while(1)
-    {    
+    {
         cap1 >> img1;
         cap2 >> img2;
 

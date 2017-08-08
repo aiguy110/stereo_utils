@@ -1,16 +1,25 @@
+
+#include <stdio.h>
+#include <iostream>
+#include <vector>
+
 #include "opencv2/features2d/features2d.hpp"
 #include "opencv2/core/core.hpp"
 #include "opencv2/calib3d/calib3d.hpp"
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include "opencv2/contrib/contrib.hpp"
-#include <stdio.h>
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
 
-using namespace cv;
 using namespace std;
+using namespace cv;
 
 int main(int argc, char* argv[])
 {
+    cout << "Started" << endl;
+    if (argc != 4){
+        cout << "Expected 3 arguments. " << argc-1 << " given. Aborting..." << endl;
+        return -1;
+    }
+
     int numBoards = atoi(argv[1]);
     int board_w = atoi(argv[2]);
     int board_h = atoi(argv[3]);
@@ -28,12 +37,16 @@ int main(int argc, char* argv[])
         obj.push_back(Point3f(j/board_w, j%board_w, 0.0f));
     }
 
+
     Mat img, gray;
-    VideoCapture cap = VideoCapture(1);
+    cout << "Attempting to initialize vid cap" << endl;
+    VideoCapture cap = VideoCapture(0);
+    cout << "Successfully initiallized vid cap" << endl;
 
     int success = 0;
     int k = 0;
     bool found = false;
+    cout << "Entering main loop" << endl;
     while (success < numBoards)
     {
         cap >> img;
@@ -80,7 +93,7 @@ int main(int argc, char* argv[])
 
     intrinsic.at<float>(0, 0) = 1;
     intrinsic.at<float>(1, 1) = 1;
-    
+
     calibrateCamera(object_points, image_points, img.size(), intrinsic, distcoeffs, rvecs, tvecs);
 
     FileStorage fs1("mycalib.yml", FileStorage::WRITE);
