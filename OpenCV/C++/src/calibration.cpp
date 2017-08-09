@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <vector>
+#include <string>
 
 #include "opencv2/features2d/features2d.hpp"
 #include "opencv2/core/core.hpp"
@@ -14,15 +15,19 @@ using namespace cv;
 
 int main(int argc, char* argv[])
 {
-    cout << "Started" << endl;
-    if (argc != 4){
-        cout << "Expected 3 arguments. " << argc-1 << " given. Aborting..." << endl;
+    if (argc < 4 or argc > 5){
+        cout << "Expected 3 or 4 arguments. " << argc-1 << " given. Aborting..." << endl;
         return -1;
     }
 
     int numBoards = atoi(argv[1]);
     int board_w = atoi(argv[2]);
     int board_h = atoi(argv[3]);
+
+    bool from_file = false;
+    if(argc == 5){
+        from_file = true;
+    }
 
     Size board_sz = Size(board_w, board_h);
     int board_n = board_w*board_h;
@@ -39,9 +44,14 @@ int main(int argc, char* argv[])
 
 
     Mat img, gray;
-    cout << "Attempting to initialize vid cap" << endl;
-    VideoCapture cap = VideoCapture(0);
-    cout << "Successfully initiallized vid cap" << endl;
+    VideoCapture cap;
+    if(from_file){
+        cout << "Opening video file..." << endl;
+        cap.open(argv[4]);
+    }else{
+        cout << "Opening web cam..." << endl;
+        cap.open(0);
+    }
 
     int success = 0;
     int k = 0;
